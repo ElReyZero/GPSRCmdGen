@@ -171,7 +171,10 @@ namespace RoboCup.AtHome.EEGPSRCmdGen
 			Console.WriteLine("Generating {0} examples in bulk mode for 6 categories", dCount);
 			try
 			{
-				for (char category = '1'; category <= '6'; ++category)
+                string oDir = String.Format("EEGPSR Examples");
+                if (!Directory.Exists(oDir))
+                    Directory.CreateDirectory(oDir);
+                for (char category = '1'; category <= '6'; ++category)
 				{
 					Console.WriteLine("Generating {0} examples for category {1}", dCount, category);
 					BulkExamples(p, category, dCount);
@@ -182,11 +185,10 @@ namespace RoboCup.AtHome.EEGPSRCmdGen
 
 		private static void BulkExamples(Program p, char category, int count)
 		{
-			string oDir = String.Format("EEGPSR Cat{0} Examples", category);
-			if(!Directory.Exists(oDir))
-			Directory.CreateDirectory(oDir);
-			string oFile = Path.Combine(oDir, String.Format("{0}.txt", oDir));
-			using (StreamWriter writer = new StreamWriter(oFile, false, System.Text.Encoding.UTF8)){
+
+            string oDir = String.Format("EEGPSR Examples");
+            string oFile = Path.Combine(oDir, String.Format("{0} Cat {1}.txt", oDir, category));
+            using (StreamWriter writer = new StreamWriter(oFile, false, System.Text.Encoding.UTF8)){
 				for(int i = 1; i <= count; ++i){
 					Task task = p.GetTask(category);
 					if (task == null) continue;
@@ -195,7 +197,6 @@ namespace RoboCup.AtHome.EEGPSRCmdGen
 					sTask = sTask.Substring(0, 1).ToUpper() + sTask.Substring(1);
 
 					WriteTaskToFile(writer, task, sTask, i);
-					GenerateTaskQR(sTask, i, oDir);
 				}
 			}
 		}
@@ -232,15 +233,6 @@ namespace RoboCup.AtHome.EEGPSRCmdGen
 					writer.WriteLine("\t{0}", r);
 			}
 			writer.WriteLine();
-		}
-
-		private static void GenerateTaskQR(string task, int i, string oDir)
-		{
-			string oFile;
-			System.Drawing.Image qr = CommandGenerator.GUI.QRDialog.GenerateQRBitmap(task, 500);
-			oFile = Path.Combine(oDir, String.Format("Example{0} - {1}.png", i.ToString().PadLeft(3, '0'), task));
-			if (File.Exists(oFile)) File.Delete(oFile);
-			qr.Save(oFile, System.Drawing.Imaging.ImageFormat.Png);
 		}
 	}
 }

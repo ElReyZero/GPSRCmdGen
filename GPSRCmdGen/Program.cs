@@ -156,8 +156,10 @@ namespace RoboCup.AtHome.GPSRCmdGen
 				Console.WriteLine("Invalid input");
 				return;
 			}
-
-			Console.WriteLine("Generating {0} examples in bulk mode for 3 categories", dCount);
+            string oDir = String.Format("GPSR Examples");
+            if (!Directory.Exists(oDir))
+                Directory.CreateDirectory(oDir);
+            Console.WriteLine("Generating {0} examples in bulk mode for 3 categories", dCount);
 			try
 			{
 				for (char category = '1'; category <= '3'; ++category)
@@ -171,10 +173,8 @@ namespace RoboCup.AtHome.GPSRCmdGen
 
 		private static void BulkExamples(Program p, char category, int count)
 		{
-			string oDir = String.Format("GPSR Cat{0} Examples", category);
-			if (!Directory.Exists(oDir))
-				Directory.CreateDirectory(oDir);
-			string oFile = Path.Combine(oDir, String.Format("{0}.txt", oDir));
+			string oDir = String.Format("GPSR Examples");
+            string oFile = Path.Combine(oDir, String.Format("{0} Cat {1}.txt", oDir, category));
 			using (StreamWriter writer = new StreamWriter(oFile, false, System.Text.Encoding.UTF8))
 			{
 				for (int i = 1; i <= count; ++i)
@@ -186,7 +186,6 @@ namespace RoboCup.AtHome.GPSRCmdGen
 					sTask = sTask.Substring(0, 1).ToUpper() + sTask.Substring(1);
 
 					WriteTaskToFile(writer, task, sTask, i);
-					GenerateTaskQR(sTask, i, oDir);
 				}
 			}
 		}
@@ -223,15 +222,6 @@ namespace RoboCup.AtHome.GPSRCmdGen
 					writer.WriteLine("\t{0}", r);
 			}
 			writer.WriteLine();
-		}
-
-		private static void GenerateTaskQR(string task, int i, string oDir)
-		{
-			string oFile;
-			System.Drawing.Image qr = CommandGenerator.GUI.QRDialog.GenerateQRBitmap(task, 500);
-			oFile = Path.Combine(oDir, String.Format("Example{0} - {1}.png", i.ToString().PadLeft(3, '0'), task));
-			if (File.Exists(oFile)) File.Delete(oFile);
-			qr.Save(oFile, System.Drawing.Imaging.ImageFormat.Png);
 		}
 	}
 }
