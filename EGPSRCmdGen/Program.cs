@@ -48,9 +48,9 @@ namespace RoboCup.AtHome.EGPSRCmdGen
 			return (k = Console.ReadKey(true)).Key == ConsoleKey.Escape ? '\0' : k.KeyChar;
 		}
 
-		private Task GetTask()
+		private Task GetTask(DifficultyDegree degree)
 		{
-			return gen.GenerateTask(DifficultyDegree.High);
+			return gen.GenerateTask(degree);
 		}
 
 		/// <summary>
@@ -95,10 +95,18 @@ namespace RoboCup.AtHome.EGPSRCmdGen
 
 					ShowQRDialog(task.ToString());
 					return;
-
-				default:
-					task = GetTask();
-					break;
+				case '1':
+					task = GetTask(DifficultyDegree.None);
+					return;
+				case '2':
+					task = GetTask(DifficultyDegree.Easy);
+					return;
+				case '3':
+					task = GetTask(DifficultyDegree.Moderate);
+					return;
+				case '4':
+					task = GetTask(DifficultyDegree.High);
+					return;
 			}
 
 			Console.WriteLine("Choosen category {0}", opc);
@@ -175,14 +183,13 @@ namespace RoboCup.AtHome.EGPSRCmdGen
 			{
 				for (int i = 1; i <= count; ++i)
 				{
-					Task task = p.GetTask();
+					Task task = p.GetTask(DifficultyDegree.High);
 					if (task == null) continue;
 					string sTask = task.ToString().Trim();
 					if (sTask.Length < 1) continue;
 					sTask = sTask.Substring(0, 1).ToUpper() + sTask.Substring(1);
 
 					WriteTaskToFile(writer, task, sTask, i);
-					GenerateTaskQR(sTask, i, oDir);
 				}
 			}
 		}
@@ -219,15 +226,6 @@ namespace RoboCup.AtHome.EGPSRCmdGen
 					writer.WriteLine("\t{0}", r);
 			}
 			writer.WriteLine();
-		}
-
-		private static void GenerateTaskQR(string task, int i, string oDir)
-		{
-			string oFile;
-			System.Drawing.Image qr = CommandGenerator.GUI.QRDialog.GenerateQRBitmap(task, 500);
-			oFile = Path.Combine(oDir, String.Format("Example{0} - {1}.png", i.ToString().PadLeft(3, '0'), task));
-			if (File.Exists(oFile)) File.Delete(oFile);
-			qr.Save(oFile, System.Drawing.Imaging.ImageFormat.Png);
 		}
 	}
 }
