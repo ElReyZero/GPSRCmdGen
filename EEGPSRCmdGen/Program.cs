@@ -210,8 +210,8 @@ namespace RoboCup.AtHome.EEGPSRCmdGen
 			writer.WriteLine("#");
 			writer.WriteLine(pad);
 			writer.WriteLine();
-			writer.WriteLine(sTask);
-			writer.WriteLine();
+            writer.WriteLine("$ {0}", sTask);
+            writer.WriteLine();
 			List<string> remarks = new List<string>();
 			foreach (Token token in task.Tokens)
 			{
